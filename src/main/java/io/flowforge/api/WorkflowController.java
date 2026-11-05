@@ -50,4 +50,9 @@ public class WorkflowController {
     public WorkflowSnapshot cancel(@PathVariable UUID workflowId) {
         return workflows.cancel(workflowId);
     }
+
+    @PostMapping("/{workflowId}/retry")
+    public WorkflowSnapshot retry(@PathVariable UUID workflowId) {
+        return workflows.retry(workflowId);
+    }
 }

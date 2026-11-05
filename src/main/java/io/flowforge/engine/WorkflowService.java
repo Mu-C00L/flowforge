@@ -118,4 +118,15 @@ public class WorkflowService {
         }
         return get(workflowId);
     }
+
+    public WorkflowSnapshot retry(UUID workflowId) {
+        WorkflowSnapshot snapshot = get(workflowId);
+        if (snapshot.status() != io.flowforge.domain.WorkflowStatus.FAILED) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Only failed workflows can be retried; current status: " + snapshot.status());
+        }
+        if (workflows.retryFailed(workflowId)) {
+            workflows.appendEvent(workflowId, null, "WORKFLOW_RETRY_REQUESTED", objectMapper.createObjectNode());
+        }
+        return get(workflowId);
+    }
 }

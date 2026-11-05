@@ -214,6 +214,28 @@ public class WorkflowRepository {
         return changed > 0;
     }
 
+    public boolean retryFailed(UUID workflowId) {
+        int changed = jdbc.sql("""
+                        UPDATE workflow_instances
+                        SET status = 'RUNNING', completed_at = NULL
+                        WHERE id = :workflowId AND status = 'FAILED'
+                        """)
+                .param("workflowId", workflowId)
+                .update();
+        if (changed > 0) {
+            jdbc.sql("""
+                            UPDATE workflow_tasks
+                            SET status = 'PENDING', attempts = 0, available_at = now(),
+                                error_message = NULL, lease_owner = NULL, lease_expires_at = NULL,
+                                updated_at = now()
+                            WHERE workflow_instance_id = :workflowId AND status = 'FAILED'
+                            """)
+                    .param("workflowId", workflowId)
+                    .update();
+        }
+        return changed > 0;
+    }
+
     public void appendEvent(UUID workflowId, UUID taskId, String type, JsonNode details) {
         jdbc.sql("""
                         INSERT INTO workflow_events
