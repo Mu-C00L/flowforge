@@ -74,6 +74,7 @@ flowchart TD
 | `GET` | `/api/v1/workflows/{id}` | Read workflow and task state |
 | `GET` | `/api/v1/workflows/{id}/events` | Read the ordered execution history |
 | `POST` | `/api/v1/workflows/{id}/cancel` | Cancel non-terminal work |
+| `POST` | `/api/v1/workflows/{id}/retry` | Retry failed tasks of a failed workflow |
 | `GET` | `/actuator/prometheus` | Scrape application and engine metrics |
 
 Built-in handlers are `echo`, `delay`, `fail-n-times`, and `idempotent-operation`. Real integrations should implement `StepHandler` and use the task ID as the downstream idempotency key.

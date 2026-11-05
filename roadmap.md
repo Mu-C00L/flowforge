@@ -14,10 +14,13 @@
 
 ## Milestone 2 — production operability
 
-- [ ] Lease heartbeats for long-running tasks
+- [x] Lease heartbeats for long-running tasks
+- [x] Per-step output data piping to dependent tasks
+- [x] Jittered exponential backoff policy
+- [x] Manual retry API for failed workflows
+- [x] Indexing for retention and terminal workflow cleanup
 - [ ] OpenTelemetry spans across API, scheduler, and handlers
 - [ ] Per-workflow retry and timeout policies
-- [ ] Pause, resume, and manual retry APIs
 - [ ] API authentication and tenant-scoped RBAC
 - [ ] Outbox-based Kafka notifications
 - [ ] Grafana dashboard and alert rules
