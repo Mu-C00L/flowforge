@@ -20,15 +20,18 @@ public class TaskExecutionEngine {
     private final StepHandlerRegistry handlers;
     private final ExecutionCoordinator coordinator;
     private final MeterRegistry metrics;
+    private final TaskRepository tasks;
 
     public TaskExecutionEngine(
             StepHandlerRegistry handlers,
             ExecutionCoordinator coordinator,
-            MeterRegistry metrics
+            MeterRegistry metrics,
+            TaskRepository tasks
     ) {
         this.handlers = handlers;
         this.coordinator = coordinator;
         this.metrics = metrics;
+        this.tasks = tasks;
     }
 
     public void execute(ClaimedTask task, String workerId) {
@@ -37,9 +40,16 @@ public class TaskExecutionEngine {
             Timer.Sample timer = Timer.start(metrics);
             try {
                 StepHandler handler = handlers.require(task.handler());
-                JsonNode output = handler.execute(new StepExecutionContext(
+                StepExecutionContext context = new StepExecutionContext(
                         task.workflowInstanceId(), task.id(), task.stepId(), task.attempt(),
-                        task.input(), task.config()));
+                        task.input(), task.config(),
+                        taskId -> {
+                            boolean renewed = tasks.heartbeat(taskId, workerId, java.time.Duration.ofSeconds(30));
+                            if (!renewed) {
+                                log.warn("Heartbeat failed to renew lease for task {} (worker {})", taskId, workerId);
+                            }
+                        });
+                JsonNode output = handler.execute(context);
                 if (coordinator.succeed(task, workerId, output)) {
                     counter("flowforge.tasks.succeeded", task.handler()).increment();
                 }

@@ -78,6 +78,19 @@ public class TaskRepository {
         return result == null ? Optional.empty() : result;
     }
 
+    public boolean heartbeat(UUID taskId, String workerId, Duration extension) {
+        OffsetDateTime expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plus(extension);
+        return jdbc.sql("""
+                        UPDATE workflow_tasks
+                        SET lease_expires_at = :expiresAt, updated_at = now()
+                        WHERE id = :taskId AND status = 'RUNNING' AND lease_owner = :workerId
+                        """)
+                .param("taskId", taskId)
+                .param("workerId", workerId)
+                .param("expiresAt", expiresAt)
+                .update() == 1;
+    }
+
     public boolean markSucceeded(UUID taskId, String workerId, String outputJson) {
         return jdbc.sql("""
                         UPDATE workflow_tasks
