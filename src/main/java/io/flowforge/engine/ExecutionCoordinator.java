@@ -61,7 +61,7 @@ public class ExecutionCoordinator {
                     .put("attempt", task.attempt())
                     .put("error", message);
             if (task.attempt() < task.maxAttempts()) {
-                var delay = BackoffPolicy.forAttempt(task.attempt());
+                var delay = BackoffPolicy.forAttempt(task.attempt(), true);
                 OffsetDateTime availableAt = OffsetDateTime.now(ZoneOffset.UTC).plus(delay);
                 if (!tasks.releaseForRetry(task.id(), workerId, availableAt, message)) {
                     return false;
