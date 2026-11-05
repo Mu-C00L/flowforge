@@ -116,9 +116,3 @@ Read [architecture.md](docs/architecture.md) for execution guarantees and the fa
 ## Current scope
 
 This is a strong milestone-one engine, not yet a multi-tenant hosted service. Authentication, tenant isolation, handler heartbeats, distributed tracing, Kafka notification, retention policies, and a web console remain explicit roadmap items. Do not expose the current API directly to the public internet.
-
-## Resume bullet template
-
-After running your own benchmark, replace the placeholders with measured values:
-
-> Designed a durable workflow engine using Java, Spring Boot, and PostgreSQL, implementing DAG scheduling, `SKIP LOCKED` task leasing, idempotent execution, exponential retries, and crash recovery; sustained **[measured throughput]** tasks/second with **[measured p95]** scheduling latency across **[worker count]** workers.
