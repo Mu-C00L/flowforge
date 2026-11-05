@@ -84,6 +84,7 @@ public class ExecutionCoordinator {
     private void advance(java.util.UUID workflowId) {
         StoredDefinition definition = definitions.findForWorkflow(workflowId);
         Map<String, TaskStatus> statuses = workflows.taskStatuses(workflowId);
+        Map<String, JsonNode> outputs = workflows.taskOutputs(workflowId);
 
         for (StepDefinition step : definition.spec().steps()) {
             if (statuses.get(step.id()) != TaskStatus.BLOCKED) {
@@ -92,7 +93,17 @@ public class ExecutionCoordinator {
             boolean dependenciesSucceeded = step.dependsOn().stream()
                     .allMatch(dependency -> statuses.get(dependency) == TaskStatus.SUCCEEDED);
             if (dependenciesSucceeded) {
-                workflows.unblock(workflowId, step.id());
+                ObjectNode mergedInput = objectMapper.createObjectNode();
+                ObjectNode depOutputs = objectMapper.createObjectNode();
+                for (String dep : step.dependsOn()) {
+                    JsonNode depOut = outputs.get(dep);
+                    if (depOut != null) {
+                        depOutputs.set(dep, depOut);
+                    }
+                }
+                mergedInput.set("dependencies", depOutputs);
+
+                workflows.unblock(workflowId, step.id(), mergedInput);
                 statuses.put(step.id(), TaskStatus.PENDING);
                 ObjectNode details = objectMapper.createObjectNode().put("stepId", step.id());
                 workflows.appendEvent(workflowId, null, "TASK_READY", details);
@@ -101,7 +112,7 @@ public class ExecutionCoordinator {
 
         if (statuses.values().stream().allMatch(status -> status == TaskStatus.SUCCEEDED)) {
             ObjectNode output = objectMapper.createObjectNode();
-            workflows.taskOutputs(workflowId).forEach(output::set);
+            outputs.forEach(output::set);
             workflows.complete(workflowId, output);
             workflows.appendEvent(workflowId, null, "WORKFLOW_SUCCEEDED", objectMapper.createObjectNode());
         }

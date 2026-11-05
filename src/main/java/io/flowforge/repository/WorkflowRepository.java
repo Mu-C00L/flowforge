@@ -151,16 +151,17 @@ public class WorkflowRepository {
         return outputs;
     }
 
-    public void unblock(UUID workflowId, String stepId) {
+    public void unblock(UUID workflowId, String stepId, JsonNode input) {
         jdbc.sql("""
                         UPDATE workflow_tasks
-                        SET status = 'PENDING', available_at = now(), updated_at = now()
+                        SET status = 'PENDING', input_json = CAST(:input AS jsonb), available_at = now(), updated_at = now()
                         WHERE workflow_instance_id = :workflowId
                           AND step_id = :stepId
                           AND status = 'BLOCKED'
                         """)
                 .param("workflowId", workflowId)
                 .param("stepId", stepId)
+                .param("input", JsonSupport.write(objectMapper, input))
                 .update();
     }
 
