@@ -112,7 +112,7 @@ Prometheus is available at `http://localhost:9090`. Useful metrics include:
 
 The first milestone uses PostgreSQL as both durable state and work queue. This keeps state transitions transactional and lets the project demonstrate its guarantees clearly. Kafka is a scale-out option once claim-table contention is measured; adding it prematurely would introduce dual-write failure modes without improving correctness.
 
-Read [architecture.md](docs/architecture.md) for execution guarantees and the failure matrix, [roadmap.md](docs/roadmap.md) for planned milestones, and [interview-guide.md](docs/interview-guide.md) for the design trade-offs worth discussing in an SDE-2 interview.
+Read [architecture.md](docs/architecture.md) for execution guarantees and the failure matrix.
 
 ## Current scope
 
