@@ -5,6 +5,7 @@ import io.flowforge.domain.ClaimedTask;
 import io.flowforge.handler.StepExecutionContext;
 import io.flowforge.handler.StepHandler;
 import io.flowforge.handler.StepHandlerRegistry;
+import io.flowforge.repository.TaskRepository;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
