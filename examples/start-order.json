@@ -1,0 +1,10 @@
+{
+  "definitionName": "order-fulfillment",
+  "definitionVersion": 1,
+  "input": {
+    "orderId": "order-2026-0001",
+    "customerId": "customer-42",
+    "amount": 1499.00,
+    "currency": "INR"
+  }
+}

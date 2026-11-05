@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: flowforge
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/flowforge}
+    username: ${DATABASE_USERNAME:flowforge}
+    password: ${DATABASE_PASSWORD:flowforge}
+    hikari:
+      maximum-pool-size: 12
+  flyway:
+    enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+flowforge:
+  worker:
+    concurrency: ${WORKER_CONCURRENCY:4}
+    poll-interval-ms: ${WORKER_POLL_INTERVAL_MS:200}
+    lease-seconds: ${WORKER_LEASE_SECONDS:30}
+    recovery-interval-ms: ${WORKER_RECOVERY_INTERVAL_MS:5000}
+
+logging:
+  pattern:
+    level: "%5p [workflow=%X{workflowId:-},task=%X{taskId:-}]"

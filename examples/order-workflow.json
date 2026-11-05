@@ -1,0 +1,44 @@
+{
+  "name": "order-fulfillment",
+  "version": 1,
+  "steps": [
+    {
+      "id": "reserve-inventory",
+      "handler": "idempotent-operation",
+      "dependsOn": [],
+      "maxAttempts": 4,
+      "config": {
+        "operation": "reserve-inventory",
+        "simulatePostCommitFailureOnAttempt": 1
+      }
+    },
+    {
+      "id": "charge-payment",
+      "handler": "idempotent-operation",
+      "dependsOn": ["reserve-inventory"],
+      "maxAttempts": 4,
+      "config": {"operation": "charge-payment"}
+    },
+    {
+      "id": "fraud-audit",
+      "handler": "delay",
+      "dependsOn": ["reserve-inventory"],
+      "maxAttempts": 2,
+      "config": {"milliseconds": 400}
+    },
+    {
+      "id": "arrange-shipment",
+      "handler": "idempotent-operation",
+      "dependsOn": ["charge-payment", "fraud-audit"],
+      "maxAttempts": 4,
+      "config": {"operation": "arrange-shipment"}
+    },
+    {
+      "id": "send-notification",
+      "handler": "echo",
+      "dependsOn": ["arrange-shipment"],
+      "maxAttempts": 2,
+      "config": {"channel": "email"}
+    }
+  ]
+}
