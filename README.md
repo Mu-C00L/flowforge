@@ -73,6 +73,8 @@ flowchart TD
 | `POST` | `/api/v1/workflows` | Start a workflow; accepts `Idempotency-Key` |
 | `GET` | `/api/v1/workflows/{id}` | Read workflow and task state |
 | `GET` | `/api/v1/workflows/{id}/events` | Read the ordered execution history |
+| `POST` | `/api/v1/workflows/{id}/pause` | Pause in-flight workflow |
+| `POST` | `/api/v1/workflows/{id}/resume` | Resume paused workflow |
 | `POST` | `/api/v1/workflows/{id}/cancel` | Cancel non-terminal work |
 | `POST` | `/api/v1/workflows/{id}/retry` | Retry failed tasks of a failed workflow |
 | `GET` | `/actuator/prometheus` | Scrape application and engine metrics |

@@ -51,6 +51,16 @@ public class WorkflowController {
         return workflows.cancel(workflowId);
     }
 
+    @PostMapping("/{workflowId}/pause")
+    public WorkflowSnapshot pause(@PathVariable UUID workflowId) {
+        return workflows.pause(workflowId);
+    }
+
+    @PostMapping("/{workflowId}/resume")
+    public WorkflowSnapshot resume(@PathVariable UUID workflowId) {
+        return workflows.resume(workflowId);
+    }
+
     @PostMapping("/{workflowId}/retry")
     public WorkflowSnapshot retry(@PathVariable UUID workflowId) {
         return workflows.retry(workflowId);

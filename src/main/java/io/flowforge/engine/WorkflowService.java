@@ -119,6 +119,28 @@ public class WorkflowService {
         return get(workflowId);
     }
 
+    public WorkflowSnapshot pause(UUID workflowId) {
+        WorkflowSnapshot snapshot = get(workflowId);
+        if (snapshot.status() != io.flowforge.domain.WorkflowStatus.RUNNING) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Only running workflows can be paused; current status: " + snapshot.status());
+        }
+        if (workflows.pause(workflowId)) {
+            workflows.appendEvent(workflowId, null, "WORKFLOW_PAUSED", objectMapper.createObjectNode());
+        }
+        return get(workflowId);
+    }
+
+    public WorkflowSnapshot resume(UUID workflowId) {
+        WorkflowSnapshot snapshot = get(workflowId);
+        if (snapshot.status() != io.flowforge.domain.WorkflowStatus.PAUSED) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Only paused workflows can be resumed; current status: " + snapshot.status());
+        }
+        if (workflows.resume(workflowId)) {
+            workflows.appendEvent(workflowId, null, "WORKFLOW_RESUMED", objectMapper.createObjectNode());
+        }
+        return get(workflowId);
+    }
+
     public WorkflowSnapshot retry(UUID workflowId) {
         WorkflowSnapshot snapshot = get(workflowId);
         if (snapshot.status() != io.flowforge.domain.WorkflowStatus.FAILED) {

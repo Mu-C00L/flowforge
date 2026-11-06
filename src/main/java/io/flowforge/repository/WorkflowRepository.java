@@ -197,7 +197,7 @@ public class WorkflowRepository {
         int changed = jdbc.sql("""
                         UPDATE workflow_instances
                         SET status = 'CANCELED', completed_at = now()
-                        WHERE id = :workflowId AND status = 'RUNNING'
+                        WHERE id = :workflowId AND status IN ('RUNNING', 'PAUSED')
                         """)
                 .param("workflowId", workflowId)
                 .update();
@@ -212,6 +212,26 @@ public class WorkflowRepository {
                     .update();
         }
         return changed > 0;
+    }
+
+    public boolean pause(UUID workflowId) {
+        return jdbc.sql("""
+                        UPDATE workflow_instances
+                        SET status = 'PAUSED'
+                        WHERE id = :workflowId AND status = 'RUNNING'
+                        """)
+                .param("workflowId", workflowId)
+                .update() == 1;
+    }
+
+    public boolean resume(UUID workflowId) {
+        return jdbc.sql("""
+                        UPDATE workflow_instances
+                        SET status = 'RUNNING'
+                        WHERE id = :workflowId AND status = 'PAUSED'
+                        """)
+                .param("workflowId", workflowId)
+                .update() == 1;
     }
 
     public boolean retryFailed(UUID workflowId) {
